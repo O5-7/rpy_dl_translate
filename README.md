@@ -8,4 +8,4 @@
 ### [mbert50](https://huggingface.co/facebook/mbart-large-50-many-to-one-mmt)<br>
 
 
-### [<font color=#FF00FF >:)</font>](https://subscribestar.adult/selebus)<br>
+### [![](https://via.placeholder.com/70/0D1117/FF00FF?text=:%29)](https://subscribestar.adult/selebus)<br>
