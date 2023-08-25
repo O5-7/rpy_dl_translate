@@ -5,9 +5,11 @@ import dl_translate as dlt
 
 
 class rpy_translate_manager:
-    def __init__(self):
+    def __init__(self, model_or_path: str = '', model_family: str = 'mbart50', device: str = "auto"):
+        self.model_or_path = model_or_path
+        self.model_fanily = model_family
+        self.device = device
         self.mt = None
-        self.overwrite = False
 
         self.source_folder = ''
         self.target_folder = ''
@@ -56,9 +58,9 @@ class rpy_translate_manager:
         if self.mt is None:
             print('加载模型中...')
             self.mt = dlt.TranslationModel(
-                model_or_path=r'E:\PycharmProjects\dl_models\mbart-large-50-one-to-many-mmt',
-                model_family='mbart50',
-                device="gpu"
+                model_or_path=self.model_or_path,
+                model_family=self.model_fanily,
+                device=self.device
             )
         for file_name in self.target_files_names:
             self.target_files_dict[file_name].translate(self.mt)
@@ -68,9 +70,9 @@ class rpy_translate_manager:
         if self.mt is None:
             print('加载模型中...')
             self.mt = dlt.TranslationModel(
-                model_or_path=r'E:\PycharmProjects\dl_models\mbart-large-50-one-to-many-mmt',
-                model_family='mbart50',
-                device="gpu"
+                model_or_path=self.model_or_path,
+                model_family=self.model_fanily,
+                device=self.device
             )
             for file_name in self.target_files_names:
                 for k, v in self.target_files_dict[file_name].seq_dict.items():
@@ -78,6 +80,9 @@ class rpy_translate_manager:
                     v[4] = translate_result
                     self.target_files_dict[file_name].update({k, v})
         return
+
+    def set_mt(self, mt_: dlt.TranslationModel):
+        self.mt = mt_
 
     def write_translate_result(self):
         for file_name in self.target_files_names:
@@ -100,7 +105,7 @@ class rpy_translate_manager:
 
 
 if __name__ == '__main__':
-    rm = rpy_translate_manager()
+    rm = rpy_translate_manager(r'E:\PycharmProjects\dl_models\mbart-large-50-one-to-many-mmt')
     rm.set_source_folder('./s_test_folder')
     rm.set_target_folder('./t_test_folder')
     rm.set_result_folder('./r_test_folder')
