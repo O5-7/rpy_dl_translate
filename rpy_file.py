@@ -8,7 +8,6 @@ from datetime import datetime
 
 class rpy_file:
     def __init__(self, rpy_path: str):
-        self.mt = None
         self.seq_dict = {}
         self.read_rpy_file(rpy_path)
 
@@ -20,6 +19,7 @@ class rpy_file:
         return seq
 
     def read_rpy_file(self, file_path: str):
+        print(file_path + ' load')
         self.seq_dict = {}
         r_file = open(file_path, mode='r', encoding='utf-8')
         seq_hash = ''
@@ -69,7 +69,7 @@ class rpy_file:
             return
         if self.seq_dict.__len__() == 0: return
         w_file = open(file_path, mode='w', encoding='utf-8')
-        w_file.write('# TODO: Translation updated at ' + datetime.now().now().strftime('%Y-%m-%d %H:%M') + '\n')
+        w_file.write('# Translation updated at ' + datetime.now().now().strftime('%Y-%m-%d %H:%M') + '\n')
         w_file.write('# translated by python script, using dl-translate\n')
         w_file.write('# model: mbart-large-50-one-to-many-mmt\n')
         w_file.write('# github: https://github.com/O5-7/rpy_dl_translate\n\n\n')
@@ -88,18 +88,12 @@ class rpy_file:
             if k in source_file.seq_dict:
                 self.seq_dict.update({k: source_file.seq_dict.get(k)})
 
-    def translate(self, ):
-        if self.mt is None:
-            self.mt = dlt.TranslationModel(
-                model_or_path=r'E:\PycharmProjects\dl_models\mbart-large-50-one-to-many-mmt',
-                model_family='mbart50',
-                device="gpu"
-            )
+    def translate(self, mt: dlt.TranslationModel):
         for k, v in self.seq_dict.items():
-            if not k[0]:
-                translate_result = self.mt.translate(v[3], source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE)
+            if not v[0]:
+                translate_result = mt.translate(v[3], source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE)
                 v[4] = translate_result
-                self.seq_dict.update({k, v})
+                self.seq_dict.update({k: v})
 
 
 if __name__ == '__main__':
