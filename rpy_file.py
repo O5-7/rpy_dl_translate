@@ -63,7 +63,7 @@ class rpy_file:
                 continue
         r_file.close()
 
-    def write_rpy_file(self, file_path: str):
+    def write_rpy_file(self, file_path: str, model_name: str = 'mbart-large-50-one-to-many-mmt'):
         if os.path.exists(file_path):
             print('文件已存在,如需覆盖请手动覆盖')
             return
@@ -71,7 +71,7 @@ class rpy_file:
         w_file = open(file_path, mode='w', encoding='utf-8')
         w_file.write('# Translation updated at ' + datetime.now().now().strftime('%Y-%m-%d %H:%M') + '\n')
         w_file.write('# translated by python script, using dl-translate\n')
-        w_file.write('# model: mbart-large-50-one-to-many-mmt\n')
+        w_file.write('# model: {}\n'.format(model_name))
         w_file.write('# github: https://github.com/O5-7/rpy_dl_translate\n\n\n')
         for k, v in self.seq_dict.items():
             w_file.write('translate chinese_dl ' + k + ':\n')

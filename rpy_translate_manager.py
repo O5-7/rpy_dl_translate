@@ -7,9 +7,9 @@ import dl_translate as dlt
 class rpy_translate_manager:
     def __init__(self, model_or_path: str = '', model_family: str = 'mbart50', device: str = "auto"):
         self.model_or_path = model_or_path
-        self.model_fanily = model_family
+        self.model_family = model_family
         self.device = device
-        self.mt = None
+        self.mt: dlt.TranslationModel = None
 
         self.source_folder = ''
         self.target_folder = ''
@@ -59,7 +59,7 @@ class rpy_translate_manager:
             print('加载模型中...')
             self.mt = dlt.TranslationModel(
                 model_or_path=self.model_or_path,
-                model_family=self.model_fanily,
+                model_family=self.model_family,
                 device=self.device
             )
         for file_name in self.target_files_names:
@@ -71,7 +71,7 @@ class rpy_translate_manager:
             print('加载模型中...')
             self.mt = dlt.TranslationModel(
                 model_or_path=self.model_or_path,
-                model_family=self.model_fanily,
+                model_family=self.model_family,
                 device=self.device
             )
             for file_name in self.target_files_names:
@@ -87,7 +87,7 @@ class rpy_translate_manager:
     def write_translate_result(self):
         for file_name in self.target_files_names:
             result_file_path = os.path.join(self.result_folder, file_name)
-            self.target_files_dict[file_name].write_rpy_file(result_file_path)
+            self.target_files_dict[file_name].write_rpy_file(result_file_path, self.mt.model_family)
 
     def set_source_folder(self, s_f):
         if os.path.isdir(s_f):
@@ -113,4 +113,3 @@ if __name__ == '__main__':
     rm.transfer()
     rm.quick_translate()
     rm.write_translate_result()
-    print(1)
