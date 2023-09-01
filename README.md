@@ -26,7 +26,9 @@ tqdm = 4.64.1
 ```
 
 在[mBART50模型文件](https://huggingface.co/facebook/mbart-large-50-many-to-one-mmt/tree/main)里下载指定的6个文件到**一个文件夹**里,并记住**文件夹**的路径
+
 ![](readme_imgs/model_download.png)
+
 ---
 
 ### step 0: 生成目标`.rpy`文件
