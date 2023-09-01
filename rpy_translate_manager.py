@@ -2,6 +2,9 @@ import os
 from tqdm import tqdm
 from rpy_file import rpy_file
 import dl_translate as dlt
+from translate_string import translate_string
+# TODO: 还原角色名
+# TODO: 还原替换字符
 
 
 class rpy_translate_manager:
@@ -36,12 +39,12 @@ class rpy_translate_manager:
         self.target_files_names = [i for i in t_files_names if i.endswith('.rpy')]
 
         self.matching_files = list(set(s_files_names) & set(t_files_names))
-        print(self.matching_files)
-        for file_name in self.matching_files:
+        # print(self.matching_files)
+        for file_name in tqdm(self.matching_files, ncols=120):
             s_file_path = os.path.join(self.source_folder, file_name)
             self.source_files_dict.update({file_name: rpy_file(s_file_path)})
 
-        for file_name in t_files_names:
+        for file_name in tqdm(t_files_names, ncols=120):
             t_file_path = os.path.join(self.target_folder, file_name)
             self.target_files_dict.update({file_name: rpy_file(t_file_path)})
 
@@ -51,10 +54,17 @@ class rpy_translate_manager:
 
         :return: None
         """
-        for file_name in tqdm(self.matching_files, ncols=150):
+        for file_name in tqdm(self.matching_files):
             self.target_files_dict[file_name].update(self.source_files_dict[file_name])
 
     def quick_translate(self):
+        """
+        对未翻译的进行翻译
+
+        未载入时会载入模型
+
+        :return: None
+        """
         if self.mt is None:
             print('加载模型中...')
             self.mt = dlt.TranslationModel(
@@ -62,11 +72,17 @@ class rpy_translate_manager:
                 model_family=self.model_family,
                 device=self.device
             )
+            print('模型加载成功:{}'.format(self.model_family))
         for file_name in self.target_files_names:
             self.target_files_dict[file_name].translate(self.mt)
         return
 
     def full_translate(self):
+        """
+        全翻译, 忽略未翻译的和人工翻译的
+
+        :return: None
+        """
         if self.mt is None:
             print('加载模型中...')
             self.mt = dlt.TranslationModel(
@@ -74,20 +90,35 @@ class rpy_translate_manager:
                 model_family=self.model_family,
                 device=self.device
             )
+            print('模型加载成功:{}'.format(self.model_family))
             for file_name in self.target_files_names:
                 for k, v in self.target_files_dict[file_name].seq_dict.items():
-                    translate_result = self.mt.translate(v[3], source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE)
-                    v[4] = translate_result
+                    v: translate_string
+                    translate_result = self.mt.translate(v.origin, source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE)
+                    v.type = 'DL_translation'
+                    v.translate = translate_result
                     self.target_files_dict[file_name].update({k, v})
         return
 
     def set_mt(self, mt_: dlt.TranslationModel):
+        """
+        手动设置dlt.TranslationModel对象
+
+        :param mt_: TranslationModel
+        :return: None
+        """
+
         self.mt = mt_
 
     def write_translate_result(self):
+        """
+        将内存中的文件写到指定的文件夹中
+
+        :return: None
+        """
         for file_name in self.target_files_names:
             result_file_path = os.path.join(self.result_folder, file_name)
-            self.target_files_dict[file_name].write_rpy_file(result_file_path, self.mt.model_family)
+            self.target_files_dict[file_name].write_rpy_file(result_file_path, self.mt.model_family if self.mt is not None else 'None')
 
     def set_source_folder(self, s_f):
         if os.path.isdir(s_f):
@@ -103,6 +134,18 @@ class rpy_translate_manager:
             print('已创建文件夹' + r_f)
         self.result_folder = r_f
 
+    def STQW(self):
+        """
+        快速实现扫描,迁移,翻译,写文件
+
+        :return: None
+        """
+
+        rm.scan_files()
+        rm.transfer()
+        rm.quick_translate()
+        rm.write_translate_result()
+
 
 if __name__ == '__main__':
     rm = rpy_translate_manager(r'E:\PycharmProjects\dl_models\mbart-large-50-one-to-many-mmt')
@@ -111,5 +154,5 @@ if __name__ == '__main__':
     rm.set_result_folder('./r_test_folder')
     rm.scan_files()
     rm.transfer()
-    rm.quick_translate()
+    # rm.quick_translate()
     rm.write_translate_result()
