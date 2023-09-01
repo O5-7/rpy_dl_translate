@@ -53,9 +53,16 @@ tqdm = 4.64.1
 * `folder_t` 存放目标`.rpy`文件, step0 生成的文件
 * `folder_r` 存放输出`.rpy`文件, 空文件夹, 翻译的结果会放在这里
 
-代码部分: 替换4个`[]`为前文提到的4个**文件夹**的路径
+代码部分: 
 
+`rpy_file.py`, `rpy_translate_manager.py`, `translate_string.py` 以及你的`main.py`在同一目录下
+
+替换4个`[]`为前文提到的4个**文件夹**的路径
 ``` python
+from translate_string import translate_string
+from rpy_file import rpy_file
+from rpy_translate_manager import rpy_translate_manager
+
 rm = rpy_translate_manager(r'[]') # 下载的模型所在的文件夹 
 rm.set_source_folder(r'[]]')      # folder_s  源rpy文件的文件夹 
 rm.set_target_folder(r'[]]')      # folder_t  目标rpy文件的文件夹
