@@ -58,6 +58,7 @@ tqdm = 4.64.1
 `rpy_file.py`, `rpy_translate_manager.py`, `translate_string.py` 以及你的`main.py`在同一目录下
 
 替换4个`[]`为前文提到的4个**文件夹**的路径
+
 ``` python
 from translate_string import translate_string
 from rpy_file import rpy_file
