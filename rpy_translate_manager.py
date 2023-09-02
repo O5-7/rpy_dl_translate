@@ -3,6 +3,8 @@ from tqdm import tqdm
 from rpy_file import rpy_file
 import dl_translate as dlt
 from translate_string import translate_string
+
+
 # TODO: 还原角色名
 # TODO: 还原替换字符
 
@@ -141,18 +143,7 @@ class rpy_translate_manager:
         :return: None
         """
 
-        rm.scan_files()
-        rm.transfer()
-        rm.quick_translate()
-        rm.write_translate_result()
-
-
-if __name__ == '__main__':
-    rm = rpy_translate_manager(r'E:\PycharmProjects\dl_models\mbart-large-50-one-to-many-mmt')
-    rm.set_source_folder(r'./s_test_folder')
-    rm.set_target_folder(r'./t_test_folder')
-    rm.set_result_folder(r'./r_test_folder')
-    rm.scan_files()
-    rm.transfer()
-    # rm.quick_translate()
-    rm.write_translate_result()
+        self.scan_files()
+        self.transfer()
+        self.quick_translate()
+        self.write_translate_result()

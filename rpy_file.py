@@ -1,6 +1,4 @@
 import os
-import time
-from tqdm import tqdm
 import re
 import dl_translate as dlt
 from datetime import datetime
