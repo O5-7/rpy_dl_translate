@@ -17,7 +17,9 @@
 
 ---
 
-### step -1: 运行环境
+### step -1: 环境搭建
+
+有python环境搭建经验的可跳过此步
 
 ```
 pytorch = 2.0.0      #最好是gpu版本
@@ -25,9 +27,90 @@ dl_translate = 0.3.0
 tqdm = 4.64.1
 ```
 
+1. PyCharm, Anaconda 安装
+
+> [PyCharm下载](https://www.jetbrains.com/zh-cn/pycharm/)
+
+> [Anaconda下载](https://www.anaconda.com/download) (不建议安装在C盘)
+
+2. 安装环境
+
+设置镜像源, 在`C:\Users\[用户名]`下找到或创建文件`.condarc`, 以文本的形式打开编辑,替换为一下代码
+
+```
+channels:
+  - https://mirrors.ustc.edu.cn/anaconda/cloud/menpo/
+  - https://mirrors.ustc.edu.cn/anaconda/cloud/bioconda/
+  - https://mirrors.ustc.edu.cn/anaconda/cloud/msys2/
+  - https://mirrors.ustc.edu.cn/anaconda/cloud/conda-forge/
+  - https://mirrors.ustc.edu.cn/anaconda/pkgs/free/
+  - https://mirrors.ustc.edu.cn/anaconda/pkgs/main/
+  - defaults
+show_channel_urls: true
+default_channels:
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/r
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/msys2
+custom_channels:
+  conda-forge: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+  msys2: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+  bioconda: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+  menpo: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+  pytorch: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+  pytorch-lts: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+  simpleitk: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+report_errors: false
+```
+
+---
+
+在`开始`->`所有应用`->`Anaconda3(64bit)`中找到并打开`Anaconda Prompt`
+
+逐行运行以下指令:
+
+```
+pip install tqdm
+pip install torch
+pip install dl_translate
+```
+
+> 如果torch下载速度慢,或者卡出, 使用`ctrl+c`强制中断
+
+在[pytorch离线安装文件列表](https://download.pytorch.org/whl/torch_stable.html)中搜索`cpu/torch-2.0.1%2Bcpu`
+
+![img.png](readme_imgs/torch_whl.png)
+
+找到对应`python`版本的win_amd64版的安装文件, 下载到电脑上(文件较大)
+
+然后同样打开`Anaconda Prompt`,输入以下指令(替换文件路径)离线安装pytorch
+
+```
+pip install [whl文件的绝对路径]
+```
+
+安装完三个库后, 在`Anaconda Prompt`运行 `pip list`或`conda list` 检查是否存在`torch`, `tqdm`, `dl-translate` 三个库, 若都存在, 即安装成功
+
+---
+
+3. 创建项目
+
+打开`Pycharm`, 新建项目, 如图将`Python解释器`, `添加解释器`->`添加本地解释器`->`conda环境`, `Conda 可执行文件`项设为`Anaconda`根目录下的`python.exe`,然后点击`创建`
+
+![img.png](readme_imgs/pycharm_init.png)
+
+![img.png](readme_imgs/pycharm_env.png)
+
+创建好后, 切换到`先前配置的解释器`,选择刚刚创建的conda环境, 再创建项目
+
+打开项目, 下载`example.py`, `rpy_file.py`, `rpy_translate_manager.py`, `translate_string.py`四个文件到项目文件夹下.
+
+---
+
 在[mBART50模型文件](https://huggingface.co/facebook/mbart-large-50-many-to-one-mmt/tree/main)里下载指定的6个文件到**一个文件夹**里,并记住**文件夹**的路径
 
 ![](readme_imgs/model_download.png)
+
+以上就完成了运行脚本的准备工作
 
 ---
 
@@ -53,18 +136,17 @@ tqdm = 4.64.1
 * `folder_t` 存放目标`.rpy`文件, step0 生成的文件
 * `folder_r` 存放输出`.rpy`文件, 空文件夹, 翻译的结果会放在这里
 
-代码部分: 
+代码部分:
 
-`rpy_file.py`, `rpy_translate_manager.py`, `translate_string.py` 以及你的`main.py`在同一目录下
+`rpy_file.py`, `rpy_translate_manager.py`, `translate_string.py` 以及`emample.py`在同一目录下
 
 替换4个`[]`为前文提到的4个**文件夹**的路径
 
 ``` python
-from translate_string import translate_string
-from rpy_file import rpy_file
 from rpy_translate_manager import rpy_translate_manager
 
 rm = rpy_translate_manager(r'[]') # 下载的模型所在的文件夹 
+
 rm.set_source_folder(r'[]]')      # folder_s  源rpy文件的文件夹 
 rm.set_target_folder(r'[]]')      # folder_t  目标rpy文件的文件夹
 rm.set_result_folder(r'[]]')      # folder_r  输出rpy文件的文件夹
