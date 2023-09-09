@@ -3,6 +3,7 @@ from tqdm import tqdm
 from rpy_file import rpy_file
 import dl_translate as dlt
 from translate_string import translate_string
+import json
 
 
 # TODO: 还原角色名
@@ -10,11 +11,13 @@ from translate_string import translate_string
 
 
 class rpy_translate_manager:
-    def __init__(self, model_or_path: str = '', model_family: str = 'mbart50', device: str = "auto"):
+    def __init__(self, model_or_path: str = '', replace_json_path: str = '', model_family: str = 'mbart50', device: str = "auto"):
         self.model_or_path = model_or_path
         self.model_family = model_family
         self.device = device
         self.mt: dlt.TranslationModel = None
+
+        self.replace_json_path = replace_json_path
 
         self.source_folder = ''
         self.target_folder = ''
@@ -59,7 +62,7 @@ class rpy_translate_manager:
         for file_name in tqdm(self.matching_files):
             self.target_files_dict[file_name].update(self.source_files_dict[file_name])
 
-    def quick_translate(self):
+    def quick_translate(self, batch_size: int = 64):
         """
         对未翻译的进行翻译
 
@@ -76,7 +79,8 @@ class rpy_translate_manager:
             )
             print('模型加载成功:{}'.format(self.model_family))
         for file_name in self.target_files_names:
-            self.target_files_dict[file_name].translate(self.mt)
+            # self.target_files_dict[file_name].translate(self.mt)
+            self.target_files_dict[file_name].translate_with_batch(self.mt, batch_size)
         return
 
     def full_translate(self):
@@ -102,6 +106,19 @@ class rpy_translate_manager:
                     self.target_files_dict[file_name].update({k, v})
         return
 
+    def translation_fix(self):
+        """
+        根据提供的翻译替换json文件进行翻译替换
+
+        :return: None
+        """
+        if not os.path.exists(self.replace_json_path) and self.replace_json_path.endswith('.json'):
+            return
+        with open(self.replace_json_path, encoding='utf-8') as file_p:
+            replace_dict = json.load(file_p)
+            for file_name in tqdm(self.target_files_names, ncols=120):
+                self.target_files_dict[file_name].translation_fix(replace_dict)
+
     def set_mt(self, mt_: dlt.TranslationModel):
         """
         手动设置dlt.TranslationModel对象
@@ -112,7 +129,7 @@ class rpy_translate_manager:
 
         self.mt = mt_
 
-    def write_translate_result(self):
+    def write_translate_result(self, over_write: bool = False):
         """
         将内存中的文件写到指定的文件夹中
 
@@ -120,7 +137,7 @@ class rpy_translate_manager:
         """
         for file_name in self.target_files_names:
             result_file_path = os.path.join(self.result_folder, file_name)
-            self.target_files_dict[file_name].write_rpy_file(result_file_path, self.mt.model_family if self.mt is not None else 'None')
+            self.target_files_dict[file_name].write_rpy_file(result_file_path, self.mt.model_family if self.mt is not None else 'None', over_write=over_write)
 
     def set_source_folder(self, s_f):
         if os.path.isdir(s_f):

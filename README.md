@@ -5,6 +5,8 @@
 
 *此脚本最初设计用于[**LESSONS IN LOVE**](https://subscribestar.adult/selebus)的中文翻译, 只会针对LIL进行优化*
 
+*2023/9/10 此文档适用于v0.2,  v0.3未更新*
+
 ## 使用的第三方库和模型:
 
 ### [DL Translate](https://github.com/xhluca/dl-translate)<br>
@@ -173,10 +175,10 @@ rm.transfer()
 迁移翻译, **只会在同名文件间迁移**
 
 ``` python
-rm.quick_translate()
+rm.quick_translate(batch=64)
 ```
 
-快速翻译, 翻译非翻译的文本
+快速翻译,指定批量翻译, 翻译非翻译的文本
 
 ``` python
 rm.write_translate_result()

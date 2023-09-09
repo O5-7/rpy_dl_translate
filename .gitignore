@@ -1,3 +1,6 @@
 # test files
 *.rpy
+*.rpyc
 *_test_folder
+game*
+/030_to_034_test_files.zip
