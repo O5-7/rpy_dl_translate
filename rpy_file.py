@@ -238,9 +238,17 @@ class rpy_file:
             # 对于所有翻译
             if v.type == 'DL_translation':
                 v: translate_string
+                space_split = v.translate.split(' ')
+                if v.translate.startswith('”“'):
+                    v.translate = v.translate[2:]
+
+                if space_split.__len__() > 2:
+                    # 移除额外空格
+                    v.translate = ''.join(space_split)
+
                 for name_k, name_v in replace_dict.items():
                     # 对于所有角色名
-                    if v.origin.find(name_k) != -1:
+                    if v.origin_raw.find(name_k) != -1:
                         for ai_name in name_v:
                             # 对于所有可能的ai翻译角色名 进行替换
                             v.translate = v.translate.replace(ai_name, name_k)

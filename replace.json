@@ -54,5 +54,12 @@
   "Yuki Yamaguchi": ["山口由紀"],
   "Yumi": ["尤米", "由美", "云美" ,"由美"],
   "Sensei": ["先生"],
-  "Sekai": ["**UNKNOW_AI_NAME**"]
+  "Sekai": ["**UNKNOW_AI_NAME**"],
+  "[school]": ["[学校]", "(学校)", "学校"],
+  "[high_school]" : ["[高中]", "(高中)"],
+  "[kumon_mi_high]" : ["**UNKNOW_AI_NAME**"],
+  "[young_girl]" : ["[年轻的女孩]"],
+  "[teenager]": ["[青春期]", "[十几岁]"],
+  "[ami_love]" : ["[Ami爱]"],
+  "[ayane_love]" : ["[Ayane妮爱]"]
 }
