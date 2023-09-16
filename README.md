@@ -5,7 +5,7 @@
 
 *此脚本最初设计用于[**LESSONS IN LOVE**](https://subscribestar.adult/selebus)的中文翻译, 只会针对LIL进行优化*
 
-*2023/9/10 此文档适用于v0.2,  v0.3未更新*
+*2023/9/10 此文档适用于v0.2, v0.3未更新*
 
 ## 使用的第三方库和模型:
 
@@ -147,7 +147,8 @@ pip install [whl文件的绝对路径]
 ``` python
 from rpy_translate_manager import rpy_translate_manager
 
-rm = rpy_translate_manager(r'[]') # 下载的模型所在的文件夹 
+rm = rpy_translate_manager(model_or_path = r'[]',     # 下载的模型所在的文件夹 
+                           replace_json_path = r'[]') # replace.json文件位置 
 
 rm.set_source_folder(r'[]]')      # folder_s  源rpy文件的文件夹 
 rm.set_target_folder(r'[]]')      # folder_t  目标rpy文件的文件夹
@@ -191,6 +192,79 @@ rm.STQW()
 ```
 
 以上4步骤的一键操作
+
+
+``` python
+rm.translation_fix()
+```
+
+通过`replace.json`对AI翻译中的特定词语进行替换
+
+---
+
+## 进阶
+
+### 1. 使用GPU运行模型
+
+前提:拥有8GB以上显存的英伟达显卡
+
+1. 检查cuda版本
+
+在cmd输入指令```nvidia-smi```, 检查右上角`CUDA`版本
+
+![img.png](readme_imgs/nvidia-mai.png)
+
+2. 下载安装`whl`库文件
+
+然后打开[pytorch离线安装文件列表](https://download.pytorch.org/whl/torch_stable.html), 网页中`ctrl+F` ,搜索`cuXXX/torch-2.0.0`
+
+其中`XXX`是刚才的cuda版本号去除小数点, 比如图中11.7, 那就搜索`cu117/torch-2.0.0`, 如图
+
+![img.png](readme_imgs/cu117.png)
+
+找到对应`python`版本的win_amd64版的安装文件, 下载到电脑上(文件较大)
+
+然后同样打开`Anaconda Prompt`,输入以下指令(替换文件路径)离线安装pytorch
+
+3. 检查是否安装成功
+
+使用
+
+打开`Anaconda Prompt`, **依次**执行以下指令, 并查看输出
+
+若输出`True`, 则代表cuda版安装成功, 案例如图
+
+安装成功后, 脚本会自动切换到cuda运行
+
+```cmd
+python
+import torch
+torch.cuda.is_available()
+```
+
+![img.png](readme_imgs/cuda_success.png)
+
+---
+
+### 2. replace.json修正翻译
+
+`rm.translation_fix()`会根据`replace.json`替换翻译
+
+`replace.json`文件格式: (举例其中一行)
+
+```json
+{
+  "Ayane": ["艾安","艾安娜","艾安妮","阿安"],
+}
+```
+
+`"Ayane"`, 代表原文出现了`Ayane`, 但是翻译错了, 希望将翻译错的词还原为`Ayane`
+
+`["艾安","艾安娜","艾安妮","阿安"]`, 代表`Ayane`可能翻译成的四种结果, 希望将这些词替换为`Ayane`
+
+所以, 原句中有`Ayane`的, AI翻译中有`艾安`的, `艾安`将会被替换为`Ayane`
+
+想自行添加替换, 请按照上文指示, 并符合`.json`文件格式标准
 
 ---
 

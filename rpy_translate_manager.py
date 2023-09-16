@@ -11,7 +11,7 @@ import json
 
 
 class rpy_translate_manager:
-    def __init__(self, model_or_path: str = '', replace_json_path: str = '', model_family: str = 'mbart50', device: str = "auto"):
+    def __init__(self, model_or_path: str = '', replace_json_path: str = './replace.json', model_family: str = 'mbart50', device: str = "auto"):
         self.model_or_path = model_or_path
         self.model_family = model_family
         self.device = device
