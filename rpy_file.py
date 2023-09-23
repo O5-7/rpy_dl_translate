@@ -13,7 +13,8 @@ class rpy_file:
         self.strings_dict = {}
         self.read_rpy_file(rpy_path)
 
-    def remove_font_flag(self, seq: str):
+    @staticmethod
+    def remove_font_flag(seq: str):
         """
         移除字体格式标志
 
@@ -139,7 +140,10 @@ class rpy_file:
                 continue
         r_file.close()
 
-    def write_rpy_file(self, file_path: str, model_name: str = 'mbart-large-50-one-to-many-mmt', over_write: bool = False):
+    def write_rpy_file(self,
+                       file_path: str,
+                       model_name: str = 'mbart-large-50-one-to-many-mmt',
+                       over_write: bool = False):
         """
         将文件对象写到指定的位置
 
@@ -180,7 +184,9 @@ class rpy_file:
                 w_file.write('    new "' + v.translate + '"\n\n')
         w_file.close()
 
-    def update(self, source_file: 'rpy_file', hard_cover: bool = False):
+    def update(self,
+               source_file: 'rpy_file',
+               hard_cover: bool = False):
         """
         将另一个rpy_file对象中已翻译语句转移到此对象中
 
@@ -217,12 +223,14 @@ class rpy_file:
             v: translate_string
             if not v.is_translated:
                 translate_result = mt.translate(v.origin, source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE)
-                print('translate: {}'.format(k))
+                print('translate: {0} : {1}'.format(k, translate_result))
                 v.translate = translate_result
                 v.type = "DL_translation"
                 self.seq_dict.update({k: v})
 
-    def translate_strs_with_batch(self, origins, mt: dlt.TranslationModel):
+    def translate_strs_with_batch(self,
+                                  origins,
+                                  mt: dlt.TranslationModel):
         """
         批量翻译 针对显存溢出优化
 
@@ -234,7 +242,7 @@ class rpy_file:
         try:
             translate_results = mt.translate(origins, source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE)
         except torch.cuda.OutOfMemoryError:
-            # mbaet50模型在批量翻译时可能会导致某句出现超长导致显存溢出
+            # mbart50模型在批量翻译时可能会导致某句出现超长导致显存溢出
             # 改为逐条翻译
             split_translate = True
             translate_results = []
@@ -247,7 +255,8 @@ class rpy_file:
                 result = ''
         return translate_results
 
-    def translate_with_batch(self, mt: dlt.TranslationModel, batch_size: int = 64):
+    def translate_with_batch(self, mt: dlt.TranslationModel,
+                             batch_size: int = 64):
         """
         管理批量翻译 调整batch_size,每次翻译batch_size条句子
 
@@ -271,22 +280,25 @@ class rpy_file:
             if not v.is_translated:
                 v.type = "DL_translation"
                 batch_ready_to_translate.update({k: v.origin})
-                print('translate: {}'.format(k))
                 ready_size += 1
             if ready_size == batch_size:
                 origins = list(batch_ready_to_translate.values())
                 translate_results = self.translate_strs_with_batch(origins, mt)
                 for i in range(ready_size):
                     batch_keys = list(batch_ready_to_translate.keys())
-                    self.seq_dict[batch_keys[i]].translate = translate_results[i]
+                    key_now, translate_now = batch_keys[i], translate_results[i]
+                    print('translate: {0} : {1}'.format(key_now, translate_now))
+                    self.seq_dict[key_now].translate = translate_now
                 batch_ready_to_translate.clear()
-                batch_ready_to_translate = {}
                 ready_size = 0
         origins = list(batch_ready_to_translate.values())
         translate_results = self.translate_strs_with_batch(origins, mt)
         for i in range(ready_size):
             batch_keys = list(batch_ready_to_translate.keys())
-            self.seq_dict[batch_keys[i]].translate = translate_results[i]
+
+            key_now, translate_now = batch_keys[i], translate_results[i]
+            print('translate: {0} : {1}'.format(key_now, translate_now))
+            self.seq_dict[key_now].translate = translate_now
 
     def translation_fix(self, replace_dict: dict):
         """

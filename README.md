@@ -9,9 +9,9 @@
 
 ## 使用的第三方库和模型:
 
-### [DL Translate](https://github.com/xhluca/dl-translate)<br>
+> [DL Translate](https://github.com/xhluca/dl-translate)<br>
 
-### [mBART50](https://huggingface.co/facebook/mbart-large-50-one-to-many-mmt)<br>
+> [mBART50](https://huggingface.co/facebook/mbart-large-50-one-to-many-mmt)<br>
 
 ---
 
@@ -76,13 +76,13 @@ pip install torch
 pip install dl_translate
 ```
 
-> 如果torch下载速度慢,或者卡出, 使用`ctrl+c`强制中断
+> 如果torch下载速度慢,或者卡住, 使用`ctrl+c`强制中断
 
 在[pytorch离线安装文件列表](https://download.pytorch.org/whl/torch_stable.html)中搜索`cpu/torch-2.0.1%2Bcpu`
 
 ![img.png](readme_imgs/torch_whl.png)
 
-找到对应`python`版本的win_amd64版的安装文件, 下载到电脑上(文件较大)
+找到对应`python`版本的`win_amd64`版的安装文件, 下载到电脑上(文件较大)
 
 然后同样打开`Anaconda Prompt`,输入以下指令(替换文件路径)离线安装pytorch
 
@@ -191,7 +191,7 @@ rm.write_translate_result()
 rm.STQW()
 ```
 
-以上4步骤的一键操作
+以上4个步骤的一键操作
 
 
 ``` python
@@ -254,7 +254,7 @@ torch.cuda.is_available()
 
 ```json
 {
-  "Ayane": ["艾安","艾安娜","艾安妮","阿安"],
+  "Ayane": ["艾安","艾安娜","艾安妮","阿安"]
 }
 ```
 
