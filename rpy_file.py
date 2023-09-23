@@ -4,12 +4,13 @@ import dl_translate as dlt
 from datetime import datetime
 from translate_string import translate_string
 import torch
-import json
+import hashlib
 
 
 class rpy_file:
     def __init__(self, rpy_path: str):
         self.seq_dict = {}
+        self.strings_dict = {}
         self.read_rpy_file(rpy_path)
 
     def remove_font_flag(self, seq: str):
@@ -48,11 +49,58 @@ class rpy_file:
         origin = ''
         origin_raw = ''
         translate = ''
+
+        is_string = False
+        old = ''
+        new = ''
+
         for line in r_file.readlines():
             line = line.lstrip()
-            if line == '' or line[0] == '#' or line == '\n':
+            if line == '' or line == '\n':
+                # 空行
+                continue
+
+            if is_string:
+                # 进入strings模式
+                if line.startswith('translate'):
+                    seq_hash = line[10:].split(' ')[1][:-2]
+                    if seq_hash != 'strings':
+                        is_string = False
+                        continue
+                if line.startswith('old'):
+                    old = line[5:-1]
+                    if old[-1] == '"':
+                        old = old[:-1]
+                if line.startswith('new'):
+                    new = line[5:-1]
+                    if new[-1] == '"':
+                        new = new[:-1]
+                    if translate_type == '' and new.__len__() > 0:
+                        translate_type = "Human_translation"
+                    self.strings_dict.update({
+                        hashlib.md5(old.encode()).hexdigest()[:8]:
+                            translate_string(
+                                new.__len__() > 0,
+                                translate_type,
+                                "",
+                                old,
+                                self.remove_font_flag(old),
+                                new
+                            )})
+
+            if line.startswith('translate'):
+                # 找到句子标记 strings 或 翻译 开始
+                translate_type = ''
+                seq_hash = line[10:].split(' ')[1][:-2]
+                if seq_hash == 'strings':
+                    is_string = True
+                else:
+                    is_string = False
+                continue
+
+            if line[0] == '#':
                 if line.find('"') != -1:
-                    # 找到原句
+                    # 找到原句  #开头 包含"
                     seq_start = line.index('"')
                     speaker = line[2:seq_start - 1]
                     origin_raw = line[seq_start + 1: -2]
@@ -60,20 +108,12 @@ class rpy_file:
                 if line.startswith('# type:'):
                     translate_type = line[7:-1]
                 continue
-            if line.startswith('translate'):
-                # 找到句子标记
-                translate_type = ''
-                seq_hash = line[10:].split(' ')[1][:-2]
-                continue
+
             if line.find('"') != -1:
                 seq_start = line.index('"')
-                if line.startswith('old'):
-                    # 实际没啥用, 先保留
-                    origin = self.remove_font_flag(line[seq_start + 1: -2])
-                    continue
                 translate = line[seq_start + 1:-2]
                 if seq_hash == 'strings':
-                    # 跳过strings, 不更新到dict
+                    is_string = True
                     continue
                 if translate_type == '' and translate.__len__() > 0:
                     translate_type = "Human_translation"
@@ -113,14 +153,13 @@ class rpy_file:
         if os.path.exists(file_path) and not over_write:
             print('文件已存在!')
             return
-        if self.seq_dict.__len__() == 0:
-            print('{}空文件,未检测到要翻译的语句'.format(file_path))
         w_file = open(file_path, mode='w', encoding='utf-8')
         w_file.write('# Translation updated at ' + datetime.now().now().strftime('%Y-%m-%d %H:%M') + '\n')
         w_file.write('# translated by python script, using dl-translate\n')
         w_file.write('# model: {}\n'.format(model_name))
         w_file.write('# github: https://github.com/O5-7/rpy_dl_translate\n\n\n')
-        if self.seq_dict.__len__() == 0:
+        if self.seq_dict.__len__() == 0 and self.strings_dict.__len__() == 0:
+            print('{}空文件,未检测到要翻译的语句'.format(file_path))
             w_file.write('# 未检测到要翻译的语句,有需要请手动迁移\n')
             w_file.close()
             return
@@ -129,9 +168,16 @@ class rpy_file:
             w_file.write('translate chinese_dl ' + k + ':\n')
             w_file.write('    # ' + v.speaker + ' "' + v.origin_raw + '"\n')
             w_file.write('    # type:' + v.type + '\n')
-            # TODO: 有风险 未经测试 暂时不建议写入翻译类型
             # w_file.write('    ' + v[1] + ' "' + 'test test test' + '"\n\n')
             w_file.write('    ' + v.speaker + ' "' + v.translate + '"\n\n')
+        if self.strings_dict.__len__() > 0:
+            # strings 段
+            w_file.write('translate chinese_dl ' + 'strings' + ':\n')
+            for k, v in self.strings_dict.items():
+                v: translate_string
+                w_file.write('    # type:' + v.type + '\n')
+                w_file.write('    old "' + v.origin_raw + '"\n')
+                w_file.write('    new "' + v.translate + '"\n\n')
         w_file.close()
 
     def update(self, source_file: 'rpy_file', hard_cover: bool = False):
@@ -142,6 +188,14 @@ class rpy_file:
         :param hard_cover: TODO
         :return: None
         """
+
+        for k, v in self.strings_dict.items():
+            v: translate_string
+            if v.is_translated:
+                continue
+            # 如果有空翻译 去源翻译寻找
+            if k in source_file.strings_dict:
+                self.strings_dict.update({k: source_file.strings_dict.get(k)})
 
         for k, v in self.seq_dict.items():
             v: translate_string
@@ -205,10 +259,17 @@ class rpy_file:
         """
         batch_ready_to_translate = {}
         ready_size = 0
+
+        for k, v in self.strings_dict.items():
+            v: translate_string
+            if not v.is_translated:
+                v.type = "DL_translation"
+                v.translate = mt.translate(v.origin, source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE)
+
         for k, v in self.seq_dict.items():
             v: translate_string
-            v.type = "DL_translation"
             if not v.is_translated:
+                v.type = "DL_translation"
                 batch_ready_to_translate.update({k: v.origin})
                 print('translate: {}'.format(k))
                 ready_size += 1
