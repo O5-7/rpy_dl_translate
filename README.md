@@ -211,20 +211,21 @@ rm.quick_translate(batch=64)
 ---
 
 ``` python
-rm.write_translate_result()
-```
-
-保存文件, 保存的文件在`folder_r`文件夹里, 一般为最后一步
-
----
-
-``` python
 rm.translation_fix()
 ```
 
 通过`replace.json`对AI翻译中的特定词语进行替换
 
 仅在使用`mbart50`模型时使用, `MarianMT`可不用
+
+---
+
+``` python
+rm.write_translate_result()
+```
+
+保存文件, 保存的文件在`folder_r`文件夹里, 一般为最后一步
+
 
 ---
 
