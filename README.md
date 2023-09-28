@@ -13,7 +13,7 @@
 
 > [mBART50](https://huggingface.co/facebook/mbart-large-50-one-to-many-mmt)<br>
 
-> [MarianMT](https://huggingface.co/Normal1919/Marian-NMT-lil-fine-tune)<br>
+> [MarianMT](https://huggingface.co/Normal1919/Marian-NMT-en-zh-lil-fine-tune)<br>
 
 ---
 
@@ -114,7 +114,7 @@ pip install [whl文件的绝对路径]
 
 ![](readme_imgs/model_download.png)
 
-或者在[MarianMT模型文件](https://huggingface.co/Normal1919/Marian-NMT-lil-fine-tune/tree/main)里下载微调模型
+或者在[MarianMT模型文件](https://huggingface.co/Normal1919/Marian-NMT-en-zh-lil-fine-tune/tree/main)里下载微调模型
 
 ![img.png](readme_imgs/MarianMT.png)
 
