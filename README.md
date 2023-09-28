@@ -98,7 +98,7 @@ pip install [whl文件的绝对路径]
 
 3. 创建项目
 
-打开`Pycharm`, 新建项目, 如图将`Python解释器`, `添加解释器`->`添加本地解释器`->`conda环境`, `Conda 可执行文件`项设为`Anaconda`根目录下的`python.exe`,然后点击`创建`
+打开`Pycharm`, 新建项目, 如图将`Python解释器`, `添加解释器`->`添加本地解释器`->`conda环境`, `解释器`项设为`Anaconda`根目录下的`python.exe`,然后点击`创建`
 
 ![img.png](readme_imgs/pycharm_init.png)
 
