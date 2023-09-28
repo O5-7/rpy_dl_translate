@@ -230,7 +230,7 @@ class rpy_file:
 
     def translate_strs_with_batch(self,
                                   origins,
-                                  mt: dlt.TranslationModel):
+                                  mt):
         """
         批量翻译 针对显存溢出优化
 
@@ -239,10 +239,12 @@ class rpy_file:
         :return: 翻译结果list
         """
         split_translate = False
+        max_len = int(max([sen.__len__() for sen in origins]) * 2)
         try:
-            translate_results = mt.translate(origins, source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE)
+            translate_results = mt.translate(origins, source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE,
+                                             generation_options={'max_new_tokens': max_len})
         except torch.cuda.OutOfMemoryError:
-            # mbart50模型在批量翻译时可能会导致某句出现超长导致显存溢出
+            # 模型在批量翻译时可能会导致某句出现超长导致显存溢出
             # 改为逐条翻译
             split_translate = True
             translate_results = []
@@ -250,12 +252,22 @@ class rpy_file:
             pass
         if split_translate:
             for single in origins:
-                result = mt.translate(single, source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE)
+                result = mt.translate(single, source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE,
+                                      generation_options={'max_new_tokens': single.__len__() * 2})
                 translate_results.append(result)
                 result = ''
-        return translate_results
 
-    def translate_with_batch(self, mt: dlt.TranslationModel,
+        # 为翻译过长提供标识符
+        translate_fix_results = []
+        for res in translate_results:
+            if res.__len__() > 50 and set(list(res)).__len__() < 10:
+                translate_fix_results.append('@@可疑翻译@@ ' + res)
+            else:
+                translate_fix_results.append(res)
+
+        return translate_fix_results
+
+    def translate_with_batch(self, mt,
                              batch_size: int = 64):
         """
         管理批量翻译 调整batch_size,每次翻译batch_size条句子
@@ -273,7 +285,7 @@ class rpy_file:
             v: translate_string
             if not v.is_translated:
                 v.type = "DL_translation"
-                v.translate = mt.translate(v.origin, source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE)
+                v.translate = mt.translate(v.origin, source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE, )
 
         for k, v in self.seq_dict.items():
             v: translate_string

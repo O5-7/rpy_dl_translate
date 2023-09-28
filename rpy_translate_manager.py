@@ -4,18 +4,16 @@ from rpy_file import rpy_file
 import dl_translate as dlt
 from translate_string import translate_string
 import json
-
-
-# TODO: 还原角色名
-# TODO: 还原替换字符
+from MarianMTModel_fine_tune import MarianMTModel_fine_tune
+import warnings
 
 
 class rpy_translate_manager:
-    def __init__(self, model_or_path: str = '', replace_json_path: str = './replace.json', model_family: str = 'mbart50', device: str = "auto"):
+    def __init__(self, model_or_path: str = '', model_family: str = 'mbart50', replace_json_path: str = './replace.json', device: str = "auto"):
         self.model_or_path = model_or_path
         self.model_family = model_family
         self.device = device
-        self.mt: dlt.TranslationModel = None
+        self.mt = None
 
         self.replace_json_path = replace_json_path
 
@@ -72,11 +70,18 @@ class rpy_translate_manager:
         """
         if self.mt is None:
             print('加载模型中...')
-            self.mt = dlt.TranslationModel(
-                model_or_path=self.model_or_path,
-                model_family=self.model_family,
-                device=self.device
-            )
+
+            if self.model_family == 'mbart50':
+                self.mt = dlt.TranslationModel(
+                    model_or_path=self.model_or_path,
+                    model_family=self.model_family,
+                    device=self.device
+                )
+            if self.model_family == '':
+                self.mt = MarianMTModel_fine_tune(
+                    model_or_path=self.model_or_path,
+                    device=self.device
+                )
             print('模型加载成功:{}'.format(self.model_family))
         for file_name in self.target_files_names:
             # self.target_files_dict[file_name].translate(self.mt)
@@ -84,6 +89,7 @@ class rpy_translate_manager:
         return
 
     def full_translate(self):
+        warnings.warn("废弃, 不再维护", DeprecationWarning)
         """
         全翻译, 忽略未翻译的和人工翻译的
 

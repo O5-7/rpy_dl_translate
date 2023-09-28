@@ -5,13 +5,15 @@
 
 *此脚本最初设计用于[**LESSONS IN LOVE**](https://subscribestar.adult/selebus)的中文翻译, 只会针对LIL进行优化*
 
-*2023/9/10 此文档适用于v0.2, v0.3未更新*
+*2023/9/28 添加微调翻译, 发布模型*
 
 ## 使用的第三方库和模型:
 
 > [DL Translate](https://github.com/xhluca/dl-translate)<br>
 
 > [mBART50](https://huggingface.co/facebook/mbart-large-50-one-to-many-mmt)<br>
+
+> [MarianMT](https://huggingface.co/Normal1919/Marian-NMT-lil-fine-tune)<br>
 
 ---
 
@@ -112,6 +114,10 @@ pip install [whl文件的绝对路径]
 
 ![](readme_imgs/model_download.png)
 
+或者在[MarianMT模型文件](https://huggingface.co/Normal1919/Marian-NMT-lil-fine-tune/tree/main)里下载微调模型
+
+![img.png](readme_imgs/MarianMT.png)
+
 以上就完成了运行脚本的准备工作
 
 ---
@@ -164,10 +170,29 @@ rm.set_result_folder(r'[]]')      # folder_r  输出rpy文件的文件夹
 按照自己的需求来运行脚本:
 
 ``` python
+rm = rpy_translate_manager(self, model_or_path: str = '',
+    model_family: str = 'mbart50',
+    replace_json_path: str = './replace.json',
+    device: str = "auto")
+```
+
+初始化, 指定模型所在文件夹, 模型名, 替换`json`位置
+
+* `model_or_path`即环境搭建时下载的文件所在的文件夹
+
+* `model_family`为对应模型的名字, 只有`mbart50`和`MarianMT`两个选择
+
+* `replace_json_path`为替换`json`位置
+
+---
+
+``` python
 rm.scan_files()
 ```
 
 扫描文件夹,必须为第一步
+
+---
 
 ``` python
 rm.transfer()
@@ -175,11 +200,15 @@ rm.transfer()
 
 迁移翻译, **只会在同名文件间迁移**
 
+---
+
 ``` python
 rm.quick_translate(batch=64)
 ```
 
-快速翻译,指定批量翻译, 翻译非翻译的文本
+快速翻译,翻译非翻译的文本,`batch`指定批量翻译, 默认64, 视显存容量可以增加
+
+---
 
 ``` python
 rm.write_translate_result()
@@ -187,18 +216,15 @@ rm.write_translate_result()
 
 保存文件, 保存的文件在`folder_r`文件夹里, 一般为最后一步
 
-``` python
-rm.STQW()
-```
-
-以上4个步骤的一键操作
-
+---
 
 ``` python
 rm.translation_fix()
 ```
 
 通过`replace.json`对AI翻译中的特定词语进行替换
+
+仅在使用`mbart50`模型时使用, `MarianMT`可不用
 
 ---
 
@@ -254,7 +280,12 @@ torch.cuda.is_available()
 
 ```json
 {
-  "Ayane": ["艾安","艾安娜","艾安妮","阿安"]
+  "Ayane": [
+    "艾安",
+    "艾安娜",
+    "艾安妮",
+    "阿安"
+  ]
 }
 ```
 
@@ -267,6 +298,26 @@ torch.cuda.is_available()
 想自行添加替换, 请按照上文指示, 并符合`.json`文件格式标准
 
 ---
+
+### 3. 人工后期润色
+
+为了方便人工后期润色和排错,在翻译文本中添加了两种标志
+
+在文本中使用`ctrl+F`搜索标志
+
+1. 翻译来源标志
+
+> `type:DL_translation`: 标记此翻译为ai翻译
+>
+>`type:Human_translation`: 标记此翻译为人工翻译
+>
+> 在人工润色后, 请手动改写翻译来源标记
+
+2. 翻译错误标志
+
+> `@@可疑翻译@@` 标记针对可疑的翻译错误
+>
+> 会添加到译文的前面
 
 ## 注意事项
 
