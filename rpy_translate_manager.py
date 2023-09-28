@@ -70,7 +70,9 @@ class rpy_translate_manager:
         """
         if self.mt is None:
             print('加载模型中...')
-
+            if self.model_family not in ['mbart50', 'MarianMT']:
+                print('模型名错误!')
+                exit(0)
             if self.model_family == 'mbart50':
                 self.mt = dlt.TranslationModel(
                     model_or_path=self.model_or_path,
