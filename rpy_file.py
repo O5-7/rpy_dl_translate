@@ -169,14 +169,14 @@ class rpy_file:
             return
         for k, v in self.seq_dict.items():
             v: translate_string
-            w_file.write('translate chinese_dl ' + k + ':\n')
+            w_file.write('translate chinese_dl ' + k + ':\n\n')
             w_file.write('    # ' + v.speaker + ' "' + v.origin_raw + '"\n')
             w_file.write('    # type:' + v.type + '\n')
             # w_file.write('    ' + v[1] + ' "' + 'test test test' + '"\n\n')
             w_file.write('    ' + v.speaker + ' "' + v.translate + '"\n\n')
         if self.strings_dict.__len__() > 0:
             # strings 段
-            w_file.write('translate chinese_dl ' + 'strings' + ':\n')
+            w_file.write('translate chinese_dl ' + 'strings' + ':\n\n')
             for k, v in self.strings_dict.items():
                 v: translate_string
                 w_file.write('    # type:' + v.type + '\n')
@@ -285,13 +285,19 @@ class rpy_file:
             v: translate_string
             if not v.is_translated:
                 v.type = "DL_translation"
-                v.translate = mt.translate(v.origin, source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE, )
+                if mt.model_family == 'MarianMT':
+                    v.translate = mt.translate(v.origin_raw, source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE, )
+                else:
+                    v.translate = mt.translate(v.origin, source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE, )
 
         for k, v in self.seq_dict.items():
             v: translate_string
             if not v.is_translated:
                 v.type = "DL_translation"
-                batch_ready_to_translate.update({k: v.origin})
+                if mt.model_family == 'MarianMT':
+                    batch_ready_to_translate.update({k: v.origin_raw})
+                else:
+                    batch_ready_to_translate.update({k: v.origin})
                 ready_size += 1
             if ready_size == batch_size:
                 origins = list(batch_ready_to_translate.values())
