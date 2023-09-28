@@ -1,6 +1,7 @@
 from rpy_translate_manager import rpy_translate_manager
 
 # rm = rpy_translate_manager(r'E:\PycharmProjects\dl_models\mbart-large-50-one-to-many-mmt',
+#                            'mbart50',
 #                            './replace.json')
 
 rm = rpy_translate_manager(r'E:\PycharmProjects\opus_fine_tune\model_save',

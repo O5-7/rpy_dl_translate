@@ -77,7 +77,7 @@ class rpy_translate_manager:
                     model_family=self.model_family,
                     device=self.device
                 )
-            if self.model_family == '':
+            if self.model_family == 'MarianMT':
                 self.mt = MarianMTModel_fine_tune(
                     model_or_path=self.model_or_path,
                     device=self.device
