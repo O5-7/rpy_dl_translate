@@ -169,14 +169,14 @@ class rpy_file:
             return
         for k, v in self.seq_dict.items():
             v: translate_string
-            w_file.write('translate chinese_dl ' + k + ':\n')
+            w_file.write('translate chinese_dl ' + k + ':\n\n')
             w_file.write('    # ' + v.speaker + ' "' + v.origin_raw + '"\n')
             w_file.write('    # type:' + v.type + '\n')
             # w_file.write('    ' + v[1] + ' "' + 'test test test' + '"\n\n')
             w_file.write('    ' + v.speaker + ' "' + v.translate + '"\n\n')
         if self.strings_dict.__len__() > 0:
             # strings 段
-            w_file.write('translate chinese_dl ' + 'strings' + ':\n')
+            w_file.write('translate chinese_dl ' + 'strings' + ':\n\n')
             for k, v in self.strings_dict.items():
                 v: translate_string
                 w_file.write('    # type:' + v.type + '\n')
