@@ -19,13 +19,19 @@ class MarianMTModel_fine_tune():
         self.model.to(self.device)
 
     def translate(self, text: Union[str, List[str]], **kwargs):
-
         len_limit = int(max([list(cen.split(' ')).__len__() for cen in text]) * 2)
+        if type(text) == list and text.__len__() == 1:
+            text = text[0]
+        if len_limit < 10:
+            len_limit = 10
         with torch.no_grad():
             model_inputs = self.tokenizer(text, return_tensors="pt", padding=True)
             model_inputs.to(self.device)
 
             translated = self.model.generate(**model_inputs, max_new_tokens=len_limit).cpu()
             res = [self.tokenizer.decode(t, skip_special_tokens=True) for t in translated]
+
+            if res.__len__() == 1 and type(res) == list:
+                res = res[0]
 
             return res

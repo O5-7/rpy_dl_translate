@@ -259,12 +259,15 @@ class rpy_file:
 
         # 为翻译过长提供标识符
         translate_fix_results = []
+        if type(translate_results) == str:
+            translate_results = [translate_results]
         for res in translate_results:
             if res.__len__() > 50 and set(list(res)).__len__() < 10:
                 translate_fix_results.append('@@可疑翻译@@ ' + res)
             else:
                 translate_fix_results.append(res)
 
+        print(translate_fix_results)
         return translate_fix_results
 
     def translate_with_batch(self, mt,
@@ -287,8 +290,10 @@ class rpy_file:
                 v.type = "DL_translation"
                 if mt.model_family == 'MarianMT':
                     v.translate = mt.translate(v.origin_raw, source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE, )
+                    print('translate: strings_{0} : {1}'.format(k, v.translate))
                 else:
                     v.translate = mt.translate(v.origin, source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE, )
+                    print('translate: strings_{0} : {1}'.format(k, v.translate))
 
         for k, v in self.seq_dict.items():
             v: translate_string
@@ -313,7 +318,6 @@ class rpy_file:
         translate_results = self.translate_strs_with_batch(origins, mt)
         for i in range(ready_size):
             batch_keys = list(batch_ready_to_translate.keys())
-
             key_now, translate_now = batch_keys[i], translate_results[i]
             print('translate: {0} : {1}'.format(key_now, translate_now))
             self.seq_dict[key_now].translate = translate_now
