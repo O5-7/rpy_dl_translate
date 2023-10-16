@@ -261,6 +261,7 @@ class rpy_file:
         translate_fix_results = []
         if type(translate_results) == str:
             translate_results = [translate_results]
+
         for res in translate_results:
             if res.__len__() > 50 and set(list(res)).__len__() < 10:
                 translate_fix_results.append('@@可疑翻译@@ ' + res)
