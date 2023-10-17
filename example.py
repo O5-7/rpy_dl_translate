@@ -11,6 +11,6 @@ rm.set_target_folder(r'./t_test_folder')
 
 rm.scan_files()  # 扫描文件夹 读取文件
 rm.transfer()  # 转移已翻译的内容
-rm.quick_translate(64)  # 翻译
+rm.quick_translate(64, cover=True)  # 翻译
 # rm.translation_fix()  # 翻译修正
 rm.write_translate_result(over_write=True)  # 保存文件

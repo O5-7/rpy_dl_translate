@@ -60,7 +60,7 @@ class rpy_translate_manager:
         for file_name in tqdm(self.matching_files):
             self.target_files_dict[file_name].update(self.source_files_dict[file_name])
 
-    def quick_translate(self, batch_size: int = 64):
+    def quick_translate(self, batch_size: int = 64, cover: bool = False):
         """
         对未翻译的进行翻译
 
@@ -87,7 +87,7 @@ class rpy_translate_manager:
             print('模型加载成功:{}'.format(self.model_family))
         for file_name in self.target_files_names:
             # self.target_files_dict[file_name].translate(self.mt)
-            self.target_files_dict[file_name].translate_with_batch(self.mt, batch_size)
+            self.target_files_dict[file_name].translate_with_batch(self.mt, cover, batch_size)
         return
 
     def full_translate(self):
@@ -108,7 +108,7 @@ class rpy_translate_manager:
             for file_name in self.target_files_names:
                 for k, v in self.target_files_dict[file_name].seq_dict.items():
                     v: translate_string
-                    translate_result = self.mt.translate(v.origin, source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE)
+                    translate_result = self.mt.translate(v.origin_flag, source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE)
                     v.type = 'DL_translation'
                     v.translate = translate_result
                     self.target_files_dict[file_name].update({k, v})

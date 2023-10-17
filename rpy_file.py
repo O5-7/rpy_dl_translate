@@ -14,6 +14,17 @@ class rpy_file:
         self.read_rpy_file(rpy_path)
 
     @staticmethod
+    def remove_escape_character(seq: str):
+        if not seq.find('\\'):
+            return seq
+        else:
+            out = seq.replace(r'\"', '"')
+            out = out.replace(r'\:', ':')
+            out = out.replace(r'\'', "'")
+            out = out.replace(r'\\', '\\')
+            return out
+
+    @staticmethod
     def remove_font_flag(seq: str):
         """
         移除字体格式标志
@@ -85,6 +96,7 @@ class rpy_file:
                                 translate_type,
                                 "",
                                 old,
+                                self.remove_escape_character(old),
                                 self.remove_font_flag(old),
                                 new
                             )})
@@ -125,6 +137,7 @@ class rpy_file:
                             translate_type,
                             speaker,
                             origin_raw,
+                            self.remove_escape_character(origin_raw),
                             origin,
                             translate)
                     })
@@ -222,7 +235,7 @@ class rpy_file:
         for k, v in self.seq_dict.items():
             v: translate_string
             if not v.is_translated:
-                translate_result = mt.translate(v.origin, source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE)
+                translate_result = mt.translate(v.origin_flag, source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE)
                 print('translate: {0} : {1}'.format(k, translate_result))
                 v.translate = translate_result
                 v.type = "DL_translation"
@@ -268,16 +281,18 @@ class rpy_file:
             else:
                 translate_fix_results.append(res)
 
-        print(translate_fix_results)
         return translate_fix_results
 
     def translate_with_batch(self, mt,
-                             batch_size: int = 64):
+                             cover: bool,
+                             batch_size: int = 64
+                             ):
         """
         管理批量翻译 调整batch_size,每次翻译batch_size条句子
 
         ps: 8GB显存下, 推荐batch_size=64
 
+        :param cover: 是否覆盖翻译
         :param mt: 指定的模型,由调用者提供
         :param batch_size: batch-size
         :return: None
@@ -287,23 +302,23 @@ class rpy_file:
 
         for k, v in self.strings_dict.items():
             v: translate_string
-            if not v.is_translated:
+            if not v.is_translated or cover:
                 v.type = "DL_translation"
                 if mt.model_family == 'MarianMT':
-                    v.translate = mt.translate(v.origin_raw, source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE, )
+                    v.translate = mt.translate(v.origin_escape, source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE, )
                     print('translate: strings_{0} : {1}'.format(k, v.translate))
                 else:
-                    v.translate = mt.translate(v.origin, source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE, )
+                    v.translate = mt.translate(v.origin_flag, source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE, )
                     print('translate: strings_{0} : {1}'.format(k, v.translate))
 
         for k, v in self.seq_dict.items():
             v: translate_string
-            if not v.is_translated:
+            if not v.is_translated or cover:
                 v.type = "DL_translation"
                 if mt.model_family == 'MarianMT':
-                    batch_ready_to_translate.update({k: v.origin_raw})
+                    batch_ready_to_translate.update({k: v.origin_escape})
                 else:
-                    batch_ready_to_translate.update({k: v.origin})
+                    batch_ready_to_translate.update({k: v.origin_flag})
                 ready_size += 1
             if ready_size == batch_size:
                 origins = list(batch_ready_to_translate.values())

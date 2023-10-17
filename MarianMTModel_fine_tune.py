@@ -19,9 +19,10 @@ class MarianMTModel_fine_tune():
         self.model.to(self.device)
 
     def translate(self, text: Union[str, List[str]], **kwargs):
+        if type(text) == str:
+            text = [text]
         len_limit = int(max([list(cen.split(' ')).__len__() for cen in text]) * 2)
-        if type(text) == list and text.__len__() == 1:
-            text = text[0]
+
         if len_limit < 10:
             len_limit = 10
         with torch.no_grad():
@@ -33,5 +34,4 @@ class MarianMTModel_fine_tune():
 
             if res.__len__() == 1 and type(res) == list:
                 res = res[0]
-
             return res
