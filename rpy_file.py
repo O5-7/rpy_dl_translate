@@ -5,6 +5,7 @@ from datetime import datetime
 from translate_string import translate_string
 import torch
 import hashlib
+from itertools import chain
 
 
 class rpy_file:
@@ -270,18 +271,12 @@ class rpy_file:
                 translate_results.append(result)
                 result = ''
 
-        # 为翻译过长提供标识符
-        translate_fix_results = []
         if type(translate_results) == str:
             translate_results = [translate_results]
 
-        for res in translate_results:
-            if res.__len__() > 50 and set(list(res)).__len__() < 10:
-                translate_fix_results.append('@@可疑翻译@@ ' + res)
-            else:
-                translate_fix_results.append(res)
+        # 为翻译过长提供标识符
 
-        return translate_fix_results
+        return translate_results
 
     def translate_with_batch(self, mt,
                              cover: bool,
@@ -331,6 +326,8 @@ class rpy_file:
                 batch_ready_to_translate.clear()
                 ready_size = 0
         origins = list(batch_ready_to_translate.values())
+        if origins.__len__() == 0:
+            return
         translate_results = self.translate_strs_with_batch(origins, mt)
         for i in range(ready_size):
             batch_keys = list(batch_ready_to_translate.keys())
@@ -345,7 +342,7 @@ class rpy_file:
         :param replace_dict: 翻译替换字典
         :return: None
         """
-        for k, v in self.seq_dict.items():
+        for k, v in chain(self.seq_dict.items(), self.strings_dict.items()):
             # 对于所有翻译
             if v.type == 'DL_translation':
                 v: translate_string
@@ -353,13 +350,30 @@ class rpy_file:
                 if v.translate.startswith('”“'):
                     v.translate = v.translate[2:]
 
-                if space_split.__len__() > 2:
+                if space_split.__len__() > 5:
                     # 移除额外空格
                     v.translate = ''.join(space_split)
 
-                for name_k, name_v in replace_dict.items():
-                    # 对于所有角色名
+                for name_k, name_v in replace_dict['keep_translate'].items():
+                    # 翻译还原
                     if v.origin_raw.find(name_k) != -1:
                         for ai_name in name_v:
                             # 对于所有可能的ai翻译角色名 进行替换
                             v.translate = v.translate.replace(ai_name, name_k)
+
+                for word_k, json_v in replace_dict['replace_translate'].items():
+                    # 翻译替换
+                    if v.origin_raw.find(word_k):
+                        for aim_word, wrong_list in json_v.items():
+                            for wrong_word in wrong_list:
+                                v.translate = v.translate.replace(wrong_word, aim_word)
+
+                for key in replace_dict['key']:
+                    # 键缺失检查
+                    if v.origin_raw.find(key):
+                        if not v.translate.find(key):
+                            v.translate = "@@键缺失@@" + v.translate
+
+                if v.translate.__len__() > 50 and set(list(v.translate)).__len__() < 10:
+                    # 过长重复检查
+                    v.translate = "@@过长重复@@" + v.translate
