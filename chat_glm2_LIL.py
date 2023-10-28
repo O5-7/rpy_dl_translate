@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from typing import List, Union
-import concurrent.futures
 import torch
 from tqdm import tqdm
 from transformers import AutoConfig, AutoModel, AutoTokenizer
@@ -23,7 +22,7 @@ class chat_glm2_LIL:
         self.config = AutoConfig.from_pretrained(model_or_path, pre_seq_len=128, trust_remote_code=True)
         self.model = AutoModel.from_pretrained(model_or_path, trust_remote_code=True, config=self.config)
 
-        prefix_state_dict = torch.load(os.path.join(model_or_path, 'prefix', checkpoint_name, "pytorch_model.bin"))
+        prefix_state_dict = torch.load(os.path.join(model_or_path, 'prefix', checkpoint_name, "pytorch_model.bin"), map_location=self.device)
         new_prefix_state_dict = {}
         for k, v in prefix_state_dict.items():
             if k.startswith("transformer.prefix_encoder."):

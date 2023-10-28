@@ -25,6 +25,7 @@ python库:
 > [chat_glm2_6b_prefix](https://huggingface.co/Normal1919/chatglm2-6b-int4-LIL-prefix)<br>
 >
 > ps: 微调模型为专为LIL训练的翻译模型
+
 ---
 
 ## 使用教程
@@ -375,10 +376,10 @@ torch.cuda.is_available()
 
 ## 注意事项
 
-1. 扫描时只识别台词的文本,其余的均忽略, 所以会输出一些空文本
+1. 扫描时只识别台词与strings的文本,其余的均忽略, 所以会输出一些空文本
 2. `folder_s`文件夹可以为空, 迁移翻译将失效
-3. 翻译速度取决于pytorch是否是gpu版以及你的gpu型号, 作者使用移动版2070-8g, 速度大约为2句每秒
-4. 忽视了所有字体格式提示符(粗体,斜体等),以防影响翻译断句
+3. 翻译速度取决于pytorch是否是gpu版以及你的gpu型号, 作者使用移动版2070-mobile-8g
+4. chat_glm翻译不具有稳定性
 
 ---
 
