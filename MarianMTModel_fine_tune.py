@@ -35,3 +35,8 @@ class MarianMTModel_fine_tune():
             if res.__len__() == 1 and type(res) == list:
                 res = res[0]
             return res
+
+
+if __name__ == '__main__':
+    a = MarianMTModel.from_pretrained("../dl_models/opus-mt-en-zh")
+    print(a)

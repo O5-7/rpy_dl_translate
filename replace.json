@@ -260,7 +260,9 @@
     ],
     "[ayane_love]": [
       "[Ayane妮爱]"
-    ]
+    ],
+    "...": ["……"],
+    "!": ["！"]
   },
   "key": [
     "[noriko_love]",
@@ -394,12 +396,14 @@
     "[nikitemp]"
   ],
   "replace_translate": {
+
     "Character": {
       "角色": [
         "特征",
         "字符"
       ]
     },
+
     "Dorm Wars": {
       "宿舍大战": [
         "宿舍战争",

@@ -5,11 +5,20 @@ import dl_translate as dlt
 from translate_string import translate_string
 import json
 from MarianMTModel_fine_tune import MarianMTModel_fine_tune
+from chat_glm2_LIL import chat_glm2_LIL
 import warnings
+from baidu_translate import baidu_translate
 
 
 class rpy_translate_manager:
     def __init__(self, model_or_path: str = '', model_family: str = 'mbart50', replace_json_path: str = './replace.json', device: str = "auto"):
+        """
+        rpy翻译器管理类
+        :param model_or_path: 本地模型地址
+        :param model_family: 模型名称 mbart50 MarianMT chatglm2
+        :param replace_json_path: 替换json路径
+        :param device: 设备
+        """
         self.model_or_path = model_or_path
         self.model_family = model_family
         self.device = device
@@ -70,9 +79,14 @@ class rpy_translate_manager:
         """
         if self.mt is None:
             print('加载模型中...')
-            if self.model_family not in ['mbart50', 'MarianMT']:
+            if self.model_family not in ['mbart50', 'MarianMT', 'chat_glm2']:
                 print('模型名错误!')
                 exit(0)
+            if self.model_family == 'chat_glm2':
+                self.mt = chat_glm2_LIL(
+                    model_or_path=self.model_or_path,
+                    device=self.device
+                )
             if self.model_family == 'mbart50':
                 self.mt = dlt.TranslationModel(
                     model_or_path=self.model_or_path,
@@ -172,3 +186,6 @@ class rpy_translate_manager:
         self.transfer()
         self.quick_translate()
         self.write_translate_result()
+
+    def baidu_translate(self, app_id, appkey):
+        mt = baidu_translate(app_id, appkey)

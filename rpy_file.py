@@ -303,7 +303,7 @@ class rpy_file:
                     v.translate = mt.translate(v.origin_escape, source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE, )
                     print('translate: strings_{0} : {1}'.format(k, v.translate))
                 else:
-                    v.translate = mt.translate(v.origin_flag, source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE, )
+                    v.translate = mt.translate(v.origin_raw, source=dlt.lang.ENGLISH, target=dlt.lang.CHINESE, )
                     print('translate: strings_{0} : {1}'.format(k, v.translate))
 
         for k, v in self.seq_dict.items():
@@ -313,7 +313,7 @@ class rpy_file:
                 if mt.model_family == 'MarianMT':
                     batch_ready_to_translate.update({k: v.origin_escape})
                 else:
-                    batch_ready_to_translate.update({k: v.origin_flag})
+                    batch_ready_to_translate.update({k: v.origin_raw})
                 ready_size += 1
             if ready_size == batch_size:
                 origins = list(batch_ready_to_translate.values())

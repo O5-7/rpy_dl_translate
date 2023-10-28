@@ -5,16 +5,25 @@
 
 *此脚本最初设计用于[**LESSONS IN LOVE**](https://subscribestar.adult/selebus)的中文翻译, 只会针对LIL进行优化*
 
-*2023/9/28 添加微调翻译, 发布模型*
-
 ## 使用的第三方库和模型:
 
+python库:
 > [DL Translate](https://github.com/xhluca/dl-translate)<br>
 
+模型&权重:
 > [mBART50](https://huggingface.co/facebook/mbart-large-50-one-to-many-mmt)<br>
-
-> [MarianMT](https://huggingface.co/Normal1919/Marian-NMT-en-zh-lil-fine-tune)<br>
-
+>
+> [mBART50_微调](https://huggingface.co/Normal1919/mbart-large-50-one-to-many-lil-fine-tune)<br>
+>
+> [MarianMT](https://huggingface.co/Helsinki-NLP/opus-mt-zh-en)<br>
+>
+> [MarianMT_微调](https://huggingface.co/Normal1919/Marian-NMT-en-zh-lil-fine-tune)<br>
+>
+> [chat_glm2_6b](https://huggingface.co/THUDM/chatglm2-6b-int4)<br>
+>
+> [chat_glm2_6b_prefix](https://huggingface.co/Normal1919/chatglm2-6b-int4-LIL-prefix)<br>
+>
+> ps: 微调模型为专为LIL训练的翻译模型
 ---
 
 ## 使用教程
@@ -118,6 +127,14 @@ pip install [whl文件的绝对路径]
 
 ![img.png](readme_imgs/MarianMT.png)
 
+或者在[chat_glm2模型文件](https://huggingface.co/facebook/mbart-large-50-one-to-many-mmt/tree/main)中下载主模型
+
+在存放`chat_glm2模型文件`的文件夹中新建名为`prefix`的文件夹并下载[chat_glm2_prefix](https://huggingface.co/Normal1919/chatglm2-6b-int4-LIL-prefix/tree/main)微调权重
+
+![img.png](readme_imgs/chat_glm.png)
+
+![img.png](readme_imgs/chat_glm_prefix.png)
+
 以上就完成了运行脚本的准备工作
 
 ---
@@ -180,7 +197,7 @@ rm = rpy_translate_manager(self, model_or_path: str = '',
 
 * `model_or_path`即环境搭建时下载的文件所在的文件夹
 
-* `model_family`为对应模型的名字, 只有`mbart50`和`MarianMT`两个选择
+* `model_family`为对应模型的名字, 有`mbart50`,`MarianMT`,`chat_glm2`和三个选择
 
 * `replace_json_path`为替换`json`位置
 
@@ -216,7 +233,6 @@ rm.translation_fix()
 
 通过`replace.json`对AI翻译中的特定词语进行替换
 
-仅在使用`mbart50`模型时使用, `MarianMT`可不用
 
 ---
 
