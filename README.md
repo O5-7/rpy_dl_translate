@@ -1,4 +1,5 @@
-# rpy dl translate
+# rpy dl translate 
+ver = 0.5
 
 ---
 *基于深度学习的`.rpy`文件翻译脚本*
