@@ -1,5 +1,4 @@
-# rpy dl translate 
-ver = 0.5
+# rpy dl translate
 
 ---
 *基于深度学习的`.rpy`文件翻译脚本*
@@ -9,7 +8,9 @@ ver = 0.5
 ## 使用的第三方库和模型:
 
 python库:
-> [DL Translate](https://github.com/xhluca/dl-translate)<br>
+> [xhluca / dl-translate](https://github.com/xhluca/dl-translate)<br>
+> 
+> [huggingface / transformers](https://github.com/huggingface/transformers)<br>
 
 模型&权重:
 > [mBART50](https://huggingface.co/facebook/mbart-large-50-one-to-many-mmt)<br>
@@ -22,7 +23,7 @@ python库:
 >
 > [chat_glm2_6b](https://huggingface.co/THUDM/chatglm2-6b-int4)<br>
 >
-> [chat_glm2_6b_prefix](https://huggingface.co/Normal1919/chatglm2-6b-int4-LIL-prefix)<br>
+> [chat_glm2_6b_prefix( GPU only )](https://huggingface.co/Normal1919/chatglm2-6b-int4-LIL-prefix)<br>
 >
 > ps: 微调模型为专为LIL训练的翻译模型
 
@@ -143,7 +144,7 @@ pip install [whl文件的绝对路径]
 
 ### step 0: 生成目标`.rpy`文件
 
-1.下载[renpy-sdk](https://www.renpy.org/latest.html)
+1.下载 [Renpy-sdk](https://www.renpy.org/latest.html)
 
 2.将游戏文件夹中`game`文件夹下的文件复制到sdk目录下`tutorial/game`文件夹里,如果`game`文件夹下没有`.rpy`文件只有`.rpyc`文件,请自行搜索`.rpyc`转`.rpy`方法
 
@@ -380,6 +381,7 @@ torch.cuda.is_available()
 2. `folder_s`文件夹可以为空, 迁移翻译将失效
 3. 翻译速度取决于pytorch是否是gpu版以及你的gpu型号, 作者使用移动版2070-mobile-8g
 4. chat_glm翻译不具有稳定性
+5. chat_glm微调版本只能在gpu环境下运行
 
 ---
 
